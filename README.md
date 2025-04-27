@@ -8,7 +8,7 @@ This project is a backend system that enables users to create, read, update, and
 
     ```bash
     git clone [https://github.com/jitheshjustin305/backendproject](https://github.com/jitheshjustin305/backendproject)
-    cd backendproject  
+    cd backendproject  #  ✅  (Assumed repo name - adjust if different)
     ```
 
 2.  **Install dependencies:**
