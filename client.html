@@ -1,0 +1,91 @@
+<body>
+    <h1>WebSocket Test Client</h1>
+
+    <button id="joinButton">Join Scene: scene1</button>
+    <button id="sendUpdateButton">Send Object Update</button>
+    <button id="createObjectButton">Create New Object</button>
+    <button id="deleteObjectButton">Delete Object</button>
+
+    <div id="updates">
+        <h2>Received Updates:</h2>
+        <ul id="updateList"></ul>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('http://localhost:3000');
+
+        const joinButton = document.getElementById('joinButton');
+        const sendUpdateButton = document.getElementById('sendUpdateButton');
+        const createObjectButton = document.getElementById('createObjectButton');
+        const deleteObjectButton = document.getElementById('deleteObjectButton'); // Get the new button
+        const updateList = document.getElementById('updateList');
+
+        socket.on('connect', () => {
+            console.log('Connected to WebSocket server');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from WebSocket server');
+        });
+
+        joinButton.addEventListener('click', () => {
+            const sceneId = 'scene1';
+            socket.emit('joinScene', sceneId);
+            console.log(`Emitted 'joinScene' for: ${sceneId}`);
+        });
+
+        sendUpdateButton.addEventListener('click', () => {
+            const updateData = {
+                sceneId: 'scene1',
+                objectId: 'testObject',
+                position: { x: Math.random(), y: Math.random(), z: Math.random() }
+            };
+            socket.emit('objectUpdated', updateData);
+            console.log('Emitted "objectUpdated":', updateData);
+        });
+
+        createObjectButton.addEventListener('click', () => {
+            const newObjectData = {
+                sceneId: 'scene1',
+                id: `newObject_${Date.now()}`,
+                type: 'box',
+                position: { x: 2, y: 2, z: 2 },
+                scale: { x: 1, y: 1, z: 1 }
+            };
+            socket.emit('objectCreated', newObjectData);
+            console.log('Emitted "objectCreated":', newObjectData);
+        });
+
+        deleteObjectButton.addEventListener('click', () => {
+            const objectToDeleteId = 'newObject_SOMEID'; // Replace with an actual object ID
+            const deleteData = {
+                sceneId: 'scene1',
+                objectId: objectToDeleteId
+            };
+            socket.emit('objectDeleted', deleteData);
+            console.log('Emitted "objectDeleted":', deleteData);
+        });
+
+        socket.on('objectUpdated', (data) => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Received update: ${JSON.stringify(data)} (Updated)`;
+            updateList.appendChild(listItem);
+            console.log('Received "objectUpdated" event:', data);
+        });
+
+        socket.on('objectCreated', (data) => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Received creation: ${JSON.stringify(data)}`;
+            updateList.appendChild(listItem);
+            console.log('Received "objectCreated" event:', data);
+        });
+
+        socket.on('objectDeleted', (data) => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `Received deletion: ${JSON.stringify(data)}`;
+            updateList.appendChild(listItem);
+            console.log('Received "objectDeleted" event:', data);
+        });
+    </script>
+</body>
